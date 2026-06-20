@@ -104,7 +104,7 @@ export default function LawyerProfile({ params: paramsPromise }) {
             </div>
           </div>
 
-          {/* RIGHT: APPOINTMENT / HIRING FORM */}
+          {/* RIGHT: APPOINTMENT FORM */}
           <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 space-y-6 lg:sticky lg:top-6">
             <h3 className="text-lg font-bold border-l-4 border-emerald-400 pl-2">Secure Consultation</h3>
             
@@ -121,13 +121,13 @@ export default function LawyerProfile({ params: paramsPromise }) {
                   <textarea
                     required
                     rows={4}
-                    placeholder="Provide a summary of your legal dispute or consultation requirements..."
+                    placeholder="Provide a summary of your legal dispute..."
                     className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl p-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition resize-none"
                   ></textarea>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs text-slate-400 font-medium">Preferred Consultation Date</label>
+                  <label className="text-xs text-slate-400 font-medium">Preferred Date</label>
                   <div className="relative flex items-center">
                     <Calendar className="absolute left-3.5 h-4 w-4 text-slate-500" />
                     <input

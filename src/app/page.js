@@ -1,3 +1,4 @@
+// src/app/page.js
 'use client';
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -8,6 +9,7 @@ export default function Home() {
   const [featuredLawyers, setFeaturedLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ব্যাকএন্ড থেকে ডাটা ফেচ করা
   useEffect(() => {
     fetch("http://localhost:5000/lawyers?limit=6")
       .then((res) => res.json())
@@ -18,16 +20,10 @@ export default function Home() {
       .catch(() => setLoading(false));
   }, []);
 
-  const categories = [
-    { name: "Criminal Law", count: "120+ Experts", icon: Shield },
-    { name: "Corporate & Business", count: "85+ Experts", icon: Scale },
-    { name: "Family & Divorce", count: "94+ Experts", icon: Award },
-    { name: "Civil Litigation", count: "150+ Experts", icon: Clock },
-  ];
-
   return (
-    <div className="space-y-20 pb-20">
+    <div className="space-y-20 pb-20 bg-[#0b0f19] text-white">
       
+      {/* 1. HERO SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 text-center space-y-6">
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl mx-auto leading-tight">
           Your Premium Gateway to Elite{" "}
@@ -46,24 +42,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 2. LEGAL CATEGORIES SECTION (এখানে লুপ তুলে সরাসরি স্ট্যাটিক কম্পোনেন্ট বসানো হয়েছে) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <h2 className="text-2xl font-bold border-l-4 border-emerald-400 pl-3">Explore Practice Areas</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat, idx) => {
-            const Icon = cat.icon;
-            return (
-              <div key={idx} className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition group cursor-pointer">
-                <div className="bg-emerald-500/10 p-3 rounded-xl w-fit group-hover:bg-emerald-500 group-hover:text-slate-950 text-emerald-400 transition mb-4">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-1">{cat.name}</h3>
-                <p className="text-sm text-slate-500">{cat.count}</p>
-              </div>
-            );
-          })}
+          
+          {/* Card 1 */}
+          <div className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition group cursor-pointer">
+            <div className="bg-emerald-500/10 p-3 rounded-xl w-fit group-hover:bg-emerald-500 group-hover:text-slate-950 text-emerald-400 transition mb-4">
+              <Shield className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-1">Criminal Law</h3>
+            <p className="text-sm text-slate-500">120+ Experts</p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition group cursor-pointer">
+            <div className="bg-emerald-500/10 p-3 rounded-xl w-fit group-hover:bg-emerald-500 group-hover:text-slate-950 text-emerald-400 transition mb-4">
+              <Scale className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-1">Corporate & Business</h3>
+            <p className="text-sm text-slate-500">85+ Experts</p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition group cursor-pointer">
+            <div className="bg-emerald-500/10 p-3 rounded-xl w-fit group-hover:bg-emerald-500 group-hover:text-slate-950 text-emerald-400 transition mb-4">
+              <Award className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-1">Family & Divorce</h3>
+            <p className="text-sm text-slate-500">94+ Experts</p>
+          </div>
+
+          {/* Card 4 */}
+          <div className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition group cursor-pointer">
+            <div className="bg-emerald-500/10 p-3 rounded-xl w-fit group-hover:bg-emerald-500 group-hover:text-slate-950 text-emerald-400 transition mb-4">
+              <Clock className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-1">Civil Litigation</h3>
+            <p className="text-sm text-slate-500">150+ Experts</p>
+          </div>
+
         </div>
       </section>
 
+      {/* 3. FEATURED LAWYERS SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex justify-between items-end">
           <h2 className="text-2xl font-bold border-l-4 border-emerald-400 pl-3">Top Rated Specialists</h2>
@@ -75,10 +98,10 @@ export default function Home() {
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
+            {[1, 2, 3].map((i) => <SkeletonCard key={i} />)}
           </div>
         ) : featuredLawyers.length === 0 ? (
-          <p className="text-slate-500 text-center py-10 bg-[#0f172a] rounded-2xl border border-slate-800">No premium lawyers available at the moment. Please check back later or seed database.</p>
+          <p className="text-slate-500 text-center py-10 bg-[#0f172a] rounded-2xl border border-slate-800">No premium lawyers available at the moment.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredLawyers.map((lawyer) => (
@@ -94,7 +117,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white mb-1">{lawyer.name}</h3>
-                    <p className="text-sm text-slate-400 line-clamp-2">{lawyer.bio || "Premium legal consultant specializing in digital and enterprise court representations."}</p>
+                    <p className="text-sm text-slate-400 line-clamp-2">{lawyer.bio}</p>
                   </div>
                   <div className="border-t border-slate-800 pt-4 flex justify-between items-center text-sm">
                     <span className="text-slate-500">Hourly Rate</span>

@@ -1,4 +1,3 @@
-// src/components/Navbar.js
 'use client';
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";

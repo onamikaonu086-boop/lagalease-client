@@ -1,4 +1,3 @@
-// src/context/AuthContext.js
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
 
@@ -8,8 +7,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [role, setRole] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    // অ্যাপ রিলোড দিলে বা প্রথমবার ওপেন হলে ইউজার ও রোল চেক করার লজিক (মাইলস্টোন ৭ ও ৮)
     useEffect(() => {
         const token = localStorage.getItem('token');
         const savedUser = localStorage.getItem('user');
@@ -18,7 +15,6 @@ export const AuthProvider = ({ children }) => {
             const parsedUser = JSON.parse(savedUser);
             setUser(parsedUser);
             
-            // ব্যাকএন্ড থেকে ইউজারের সঠিক রোল ভেরিফাই করা
             fetch(`http://localhost:5000/user/role/${parsedUser.email}`, {
                 headers: { authorization: `Bearer ${token}` }
             })
@@ -36,7 +32,6 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    // লগইন সফল হলে স্টেট আপডেট করার ফাংশন
     const loginUser = async (email, token, userProfile) => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userProfile));
@@ -47,7 +42,6 @@ export const AuthProvider = ({ children }) => {
         setRole(data.role);
     };
 
-    // লগআউট ফাংশন
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');

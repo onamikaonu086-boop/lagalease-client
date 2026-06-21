@@ -1,6 +1,6 @@
 'use client';
 import { useContext, useState } from "react";
-import { AuthContext } from "@/providers/AuthProvider"; 
+import { AuthContext } from "../context/AuthContext"; 
 import Link from "next/link";
 import { Menu, X, Search, LogOut } from "lucide-react";
 

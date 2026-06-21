@@ -1,67 +1,116 @@
 'use client';
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useContext, useState } from "react";
+import { AuthContext } from "@/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Mail, Lock, ArrowRight, Chrome } from "lucide-react";
 
 export default function Login() {
-  const { loginUser } = useAuth();
+  const { signInUser, signInWithGoogle } = useContext(AuthContext);
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+
+  const handleLogin = (e) => {
     e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
     setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/jwt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+    signInUser(email, password)
+      .then(() => {
+        router.push("/"); 
+      })
+      .catch((err) => {
+        setError("Invalid email or password. Please try again.");
       });
-      const data = await response.json();
+  };
 
-      if (data.token) {
-        const userProfile = { email, name: email.split("@")[0] };
-        await loginUser(email, data.token, userProfile);
+
+  const handleGoogleLogin = () => {
+    signInWithGoogle()
+      .then(() => {
         router.push("/");
-      } else {
-        setError("Invalid credentials.");
-      }
-    } catch (err) {
-      setError("Failed to communicate with authentication server.");
-    }
+      })
+      .catch((err) => {
+        setError("Google sign-in failed.");
+      });
   };
 
   return (
-    <div className="min-h-[75vh] flex items-center justify-center px-4">
-      <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-2xl w-full max-w-md shadow-xl">
-        <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-          Welcome Back
-        </h2>
+    <div className="min-h-screen bg-[#0b0f19] text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#0f172a] border border-slate-800 rounded-2xl p-8 space-y-6 shadow-2xl">
+        <div className="space-y-2 text-center">
+          <h1 className="text-2xl font-black tracking-tight">Welcome Back</h1>
+          <p className="text-xs text-slate-400">Sign in to your premium legal dashboard</p>
+        </div>
 
-        {error && <p className="text-rose-400 bg-rose-500/10 border border-rose-500/20 p-3 rounded-lg text-sm text-center mb-4">{error}</p>}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-xs text-center">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-slate-400 text-xs font-medium mb-1.5">Email Address</label>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-[#1e293b] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-400 transition" placeholder="john@example.com" />
+        {/* Social Login */}
+        <button 
+          onClick={handleGoogleLogin}
+          className="w-full bg-[#0b0f19] hover:bg-slate-800 border border-slate-800 text-white font-medium text-xs py-3 rounded-xl transition flex items-center justify-center space-x-2"
+        >
+          <Chrome className="h-4 w-4 text-emerald-400" />
+          <span>Continue with Google</span>
+        </button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-800"></span></div>
+          <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#0f172a] px-2 text-slate-500 font-medium">Or email sign in</span></div>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-xs text-slate-400 font-medium">Email Address</label>
+            <div className="relative flex items-center">
+              <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
+              <input 
+                required 
+                type="email" 
+                name="email" 
+                placeholder="name@company.com" 
+                className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500 transition" 
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-slate-400 text-xs font-medium mb-1.5">Password</label>
-            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-[#1e293b] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-400 transition" placeholder="••••••••" />
+          <div className="space-y-1">
+            <div className="flex justify-between">
+              <label className="text-xs text-slate-400 font-medium">Password</label>
+              <button type="button" className="text-[10px] text-emerald-400 hover:underline">Forgot?</button>
+            </div>
+            <div className="relative flex items-center">
+              <Lock className="absolute left-3 h-4 w-4 text-slate-500" />
+              <input 
+                required 
+                type="password" 
+                name="password" 
+                placeholder="••••••••" 
+                className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500 transition" 
+              />
+            </div>
           </div>
 
-          <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2.5 rounded-lg text-sm transition mt-6">
-            Sign In
+          <button 
+            type="submit" 
+            className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-3 rounded-xl transition flex items-center justify-center space-x-1 shadow-lg shadow-emerald-500/10"
+          >
+            <span>Access Dashboard</span>
+            <ArrowRight className="h-3 w-3" />
           </button>
         </form>
 
-        <p className="text-center text-xs text-slate-500 mt-6">
-          Don't have an account yet? <Link href="/register" className="text-emerald-400 hover:underline">Register here</Link>
+        <p className="text-center text-xs text-slate-500">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-emerald-400 hover:underline">
+            Register Now
+          </Link>
         </p>
       </div>
     </div>

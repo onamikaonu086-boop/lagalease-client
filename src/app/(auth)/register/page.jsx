@@ -6,35 +6,34 @@ import Link from "next/link";
 import { User, Mail, Lock, Image, ArrowRight } from "lucide-react";
 
 export default function Register() {
-  const { createUser, updateUserProfile } = useAuth();
+  const { createUser } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); 
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
+    
     const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
     const photoURL = e.target.photo.value;
-
-    setError("");
 
     if (password.length < 6) {
       setError("Password should be at least 6 characters.");
       return;
     }
 
-    createUser(email, password)
-      .then(() => {
-        updateUserProfile(name, photoURL)
-          .then(() => {
-            router.push("/"); 
-          })
-          .catch((err) => setError(err.message));
-      })
-      .catch((err) => {
-        setError(err.message.replace("Firebase: ", ""));
-      });
+    try {
+      setLoading(true);
+      await createUser(name, email, password, photoURL);
+      router.push("/"); 
+    } catch (err) {
+      setError(err.message || "Something went wrong during registration.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,9 +83,13 @@ export default function Register() {
             </div>
           </div>
 
-          <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-3 rounded-xl transition flex items-center justify-center space-x-1 shadow-lg shadow-emerald-500/10">
-            <span>Sign Up Account</span>
-            <ArrowRight className="h-3 w-3" />
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-3 rounded-xl transition flex items-center justify-center space-x-1 shadow-lg shadow-emerald-500/10 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <span>{loading ? "Registering..." : "Sign Up Account"}</span>
+            {!loading && <ArrowRight className="h-3 w-3" />}
           </button>
         </form>
 

@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useGoogleLogin } from '@react-oauth/google';
 import { Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function Login() {
-  const { login, signInWithGoogle } = useAuth();
+  const { login, loginUser } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
 
@@ -21,19 +22,47 @@ export default function Login() {
         router.push("/");
       })
       .catch((err) => {
-        setError("Invalid email or password. Please try again.");
+        setError(err.message || "Invalid email or password.");
       });
   };
 
-  const handleGoogleLogin = () => {
-    if (signInWithGoogle) {
-      signInWithGoogle()
-        .then(() => router.push("/"))
-        .catch(() => setError("Google sign-in failed."));
-    } else {
-      setError("Google sign-in is not configured yet.");
-    }
-  };
+  const googleLoginTrigger = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setError("");
+        const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const googleUser = await userInfoRes.json();
+
+        const backendRes = await fetch('http://localhost:5000/jwt', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: googleUser.name,
+            email: googleUser.email,
+            image: googleUser.picture
+          })
+        });
+
+        const backendData = await backendRes.json();
+
+        if (backendData.token) {
+          await loginUser(googleUser.email, backendData.token, {
+            name: googleUser.name,
+            email: googleUser.email,
+            image: googleUser.picture
+          });
+          router.push("/");
+        } else {
+          setError("Backend authentication failed.");
+        }
+      } catch (err) {
+        setError("Google login process failed.");
+      }
+    },
+    onError: () => setError("Google Sign-In failed."),
+  });
 
   return (
     <div className="min-h-screen bg-[#0b0f19] text-white flex items-center justify-center p-4">
@@ -49,10 +78,10 @@ export default function Login() {
           </div>
         )}
 
-        {/* Social Login */}
+        {/* Social Login Button */}
         <button
           type="button"
-          onClick={handleGoogleLogin}
+          onClick={() => googleLoginTrigger()} 
           className="w-full bg-[#0b0f19] hover:bg-slate-800 border border-slate-800 text-white font-medium text-xs py-3 rounded-xl transition flex items-center justify-center space-x-2"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">

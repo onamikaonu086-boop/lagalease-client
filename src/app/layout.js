@@ -1,26 +1,17 @@
-import { AuthProvider } from "@/context/AuthContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+'use client';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider } from '@/context/AuthContext';
 import "./globals.css";
-
-export const metadata = {
-  title: "LegalEase - Online Lawyer Hiring Platform",
-  description: "Connect with premium legal aid and expert lawyers online.",
-};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-[#0b0f19] text-white antialiased flex flex-col min-h-screen">
-        <AuthProvider>
-          <Navbar />
-          
-          <main className="flex-grow">
+      <body>
+        <GoogleOAuthProvider clientId="204458447857-hocqbhhnmgb9tmarc0edh5fq7179tc09.apps.googleusercontent.com">
+          <AuthProvider>
             {children}
-          </main>
-        
-          <Footer />
-        </AuthProvider>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

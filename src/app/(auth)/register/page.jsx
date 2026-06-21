@@ -1,12 +1,12 @@
 'use client';
-import { useContext, useState } from "react";
-import { AuthContext } from "@/providers/AuthProvider";
+import { useState } from "react";
+import { useAuth } from "../../../context/AuthContext"; 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Mail, Lock, Image, ArrowRight } from "lucide-react";
 
 export default function Register() {
-  const { createUser, updateUserProfile } = useContext(AuthContext);
+  const { createUser, updateUserProfile } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
 
@@ -19,12 +19,18 @@ export default function Register() {
 
     setError("");
 
+    if (password.length < 6) {
+      setError("Password should be at least 6 characters.");
+      return;
+    }
+
     createUser(email, password)
       .then(() => {
         updateUserProfile(name, photoURL)
           .then(() => {
             router.push("/"); 
-          });
+          })
+          .catch((err) => setError(err.message));
       })
       .catch((err) => {
         setError(err.message.replace("Firebase: ", ""));

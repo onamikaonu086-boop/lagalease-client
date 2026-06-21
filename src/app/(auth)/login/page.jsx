@@ -1,15 +1,14 @@
 'use client';
-import { useContext, useState } from "react";
-import { AuthContext } from "@/providers/AuthProvider";
+import { useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, ArrowRight, Chrome } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function Login() {
-  const { signInUser, signInWithGoogle } = useContext(AuthContext);
+  const { login, signInWithGoogle } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
-
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -17,24 +16,23 @@ export default function Login() {
     const password = e.target.password.value;
     setError("");
 
-    signInUser(email, password)
+    login(email, password)
       .then(() => {
-        router.push("/"); 
+        router.push("/");
       })
       .catch((err) => {
         setError("Invalid email or password. Please try again.");
       });
   };
 
-
   const handleGoogleLogin = () => {
-    signInWithGoogle()
-      .then(() => {
-        router.push("/");
-      })
-      .catch((err) => {
-        setError("Google sign-in failed.");
-      });
+    if (signInWithGoogle) {
+      signInWithGoogle()
+        .then(() => router.push("/"))
+        .catch(() => setError("Google sign-in failed."));
+    } else {
+      setError("Google sign-in is not configured yet.");
+    }
   };
 
   return (
@@ -52,11 +50,17 @@ export default function Login() {
         )}
 
         {/* Social Login */}
-        <button 
+        <button
+          type="button"
           onClick={handleGoogleLogin}
           className="w-full bg-[#0b0f19] hover:bg-slate-800 border border-slate-800 text-white font-medium text-xs py-3 rounded-xl transition flex items-center justify-center space-x-2"
         >
-          <Chrome className="h-4 w-4 text-emerald-400" />
+          <svg className="h-4 w-4" viewBox="0 0 24 24">
+            <path
+              fill="#EA4335"
+              d="M12.24 10.285V14.4h6.887c-.315 1.886-2.135 5.542-6.887 5.542-4.09 0-7.43-3.39-7.43-7.57s3.34-7.57 7.43-7.57c2.33 0 3.89.97 4.78 1.83l3.22-3.11C18.16 1.57 15.42 1 12.24 1 6.05 1 1 6.05 1 12.24s5.05 11.24 11.24 11.24c6.47 0 10.78-4.55 10.78-10.97 0-.74-.08-1.3-.18-1.83H12.24z"
+            />
+          </svg>
           <span>Continue with Google</span>
         </button>
 
@@ -70,12 +74,12 @@ export default function Login() {
             <label className="text-xs text-slate-400 font-medium">Email Address</label>
             <div className="relative flex items-center">
               <Mail className="absolute left-3 h-4 w-4 text-slate-500" />
-              <input 
-                required 
-                type="email" 
-                name="email" 
-                placeholder="name@company.com" 
-                className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500 transition" 
+              <input
+                required
+                type="email"
+                name="email"
+                placeholder="name@company.com"
+                className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-400 transition"
               />
             </div>
           </div>
@@ -87,18 +91,18 @@ export default function Login() {
             </div>
             <div className="relative flex items-center">
               <Lock className="absolute left-3 h-4 w-4 text-slate-500" />
-              <input 
-                required 
-                type="password" 
-                name="password" 
-                placeholder="••••••••" 
-                className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-500 transition" 
+              <input
+                required
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                className="w-full bg-[#0b0f19] border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-emerald-400 transition"
               />
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-3 rounded-xl transition flex items-center justify-center space-x-1 shadow-lg shadow-emerald-500/10"
           >
             <span>Access Dashboard</span>

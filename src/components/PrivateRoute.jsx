@@ -1,32 +1,34 @@
 'use client';
-import { useAuth } from "../context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-export default function PrivateRoute({ children }) {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+export default function PrivateRoute({ children, allowedRoles }) {
+    const { user, role, loading } = useAuth();
+    const router = useRouter();
+    const pathname = usePathname();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push("/login");
+        }
+
+        if (!loading && user && allowedRoles && !allowedRoles.includes(role)) {
+            router.push("/");
+        }
+    }, [user, role, loading, router, allowedRoles]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#0b0f19]">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#00cc88]"></div>
+            </div>
+        );
     }
-  }, [user, loading, router]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0b0f19] flex flex-col items-center justify-center space-y-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-800 border-t-emerald-500" />
-        <p className="text-xs text-slate-400 font-medium tracking-widest uppercase animate-pulse">
-          Securing Session...
-        </p>
-      </div>
-    );
-  }
+    if (user && (!allowedRoles || allowedRoles.includes(role))) {
+        return children;
+    }
 
-  if (user) {
-    return children;
-  }
-
-  return null;
+    return null;
 }

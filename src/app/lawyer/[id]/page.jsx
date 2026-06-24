@@ -18,20 +18,17 @@ export default function LawyerProfile({ params: paramsPromise }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // ─── রিভিউ স্টেট সমূহ ───
   const [reviews, setReviews] = useState([]);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [reviewLoading, setReviewLoading] = useState(false);
 
-  // ─── ফর্ম স্টেট সমূহ ───
   const [description, setDescription] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
 
   useEffect(() => {
     if (!lawyerId) return;
     
-    // লয়ার ডিটেইলস লোড করা
     fetch(`http://localhost:5000/lawyer/${lawyerId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -40,14 +37,25 @@ export default function LawyerProfile({ params: paramsPromise }) {
       })
       .catch(() => setLoading(false));
 
-    // এই লয়ারের সব রিভিউ লোড করা
     fetch(`http://localhost:5000/reviews/lawyer/${lawyerId}`)
       .then((res) => res.json())
-      .then((data) => setReviews(data))
-      .catch((err) => console.error(err));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setReviews(data);
+        } else if (data && Array.isArray(data.result)) {
+          setReviews(data.result);
+        } else if (data && Array.isArray(data.reviews)) {
+          setReviews(data.reviews);
+        } else {
+          setReviews([]); 
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setReviews([]);
+      });
   }, [lawyerId]);
 
-  // ─── বুকিং মোডাল ওপেন হ্যান্ডলার ───
   const handleBookingTrigger = (e) => {
     e.preventDefault();
     if (!user) {
@@ -60,7 +68,6 @@ export default function LawyerProfile({ params: paramsPromise }) {
     setIsModalOpen(true);
   };
 
-  // ─── ফাইনাল হায়ারিং কনফার্মেশন হ্যান্ডলার ───
   const handleHiringRequest = async () => {
     setSubmitting(true);
     const hiringData = {
@@ -83,7 +90,7 @@ export default function LawyerProfile({ params: paramsPromise }) {
         body: JSON.stringify(hiringData)
       });
       const data = await res.json();
-      if (data.success) {
+      if (data.success || res.ok) {
         toast.success(`Hiring request sent to ${lawyer.name}!`);
         setIsModalOpen(false);
         router.push('/dashboard/user/hiring-history');
@@ -95,7 +102,6 @@ export default function LawyerProfile({ params: paramsPromise }) {
     }
   };
 
-  // ─── নতুন রিভিউ সাবমিট হ্যান্ডলার ───
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -121,10 +127,13 @@ export default function LawyerProfile({ params: paramsPromise }) {
         body: JSON.stringify(reviewData)
       });
       const data = await res.json();
-      if (data.success) {
+      if (data.success || res.ok) {
         toast.success("Review added successfully!");
         setComment("");
-        setReviews([{ ...reviewData, _id: data.insertedId }, ...reviews]);
+        setReviews(prev => [
+          { ...reviewData, _id: data.insertedId || Date.now().toString() }, 
+          ...(Array.isArray(prev) ? prev : [])
+        ]);
       }
     } catch (error) {
       toast.error("Failed to submit review");
@@ -210,9 +219,9 @@ export default function LawyerProfile({ params: paramsPromise }) {
               </div>
             </div>
 
-            {/* ─── 💬 FEEDBACK & COMMENT WORKSPACE ─── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* leave a feedback */}
+              
+              {/* Leave a feedback */}
               <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 shadow-xl">
                 <h3 className="text-md font-bold text-white mb-4 tracking-wide uppercase text-xs border-l-4 border-emerald-400 pl-2">Leave a Feedback</h3>
                 <form onSubmit={handleReviewSubmit} className="space-y-4">
@@ -250,14 +259,17 @@ export default function LawyerProfile({ params: paramsPromise }) {
                 </form>
               </div>
 
-              {/* view client feedbacks */}
+              {/* View client feedbacks */}
               <div className="bg-[#0f172a] border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col">
-                <h3 className="text-md font-bold text-white mb-4 tracking-wide uppercase text-xs border-l-4 border-emerald-400 pl-2">Client Feedbacks ({reviews.length})</h3>
-                {reviews.length === 0 ? (
+                <h3 className="text-md font-bold text-white mb-4 tracking-wide uppercase text-xs border-l-4 border-emerald-400 pl-2">
+                  Client Feedbacks ({Array.isArray(reviews) ? reviews.length : 0})
+                </h3>
+                
+                {!reviews || !Array.isArray(reviews) || reviews.length === 0 ? (
                   <p className="text-xs text-slate-500 italic my-auto text-center">No client insights yet. Be the first to review!</p>
                 ) : (
                   <div className="space-y-4 max-h-[290px] overflow-y-auto pr-1">
-                    {reviews.map((rev) => (
+                    {reviews?.map((rev) => (
                       <div key={rev._id} className="border-b border-slate-800/60 pb-3 last:border-none last:pb-0">
                         <div className="flex justify-between items-center mb-1">
                           <h5 className="text-xs font-bold text-white">{rev.clientName}</h5>

@@ -12,8 +12,12 @@ export default function MyComments() {
     useEffect(() => {
         if (!user?.email) return;
 
-        fetch(`http://localhost:5000/reviews/client/${user.email}`)
-            .then((res) => res.json())
+        setLoading(true);
+        fetch(`http://localhost:5000/reviews/user/${user.email}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Network response was not ok");
+                return res.json();
+            })
             .then((data) => {
                 if (Array.isArray(data)) {
                     setComments(data);
@@ -22,10 +26,12 @@ export default function MyComments() {
                 } else {
                     setComments([]); 
                 }
-                setLoading(false);
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error("Error fetching comments:", error);
                 setComments([]);
+            })
+            .finally(() => {
                 setLoading(false);
             });
     }, [user?.email]);
@@ -42,13 +48,23 @@ export default function MyComments() {
             if (data.deletedCount > 0) {
                 toast.success("Review deleted successfully.");
                 setComments(prev => prev.filter(c => c._id !== id));
+            } else {
+                toast.error("Review already deleted or not found.");
             }
         } catch (error) {
+            console.error("Delete error:", error);
             toast.error("Failed to delete review.");
         }
     };
 
-    if (loading) return <div className="text-slate-400 text-sm">Loading user feedback records...</div>;
+    if (loading) {
+        return (
+            <div className="flex items-center space-x-2 text-slate-400 text-sm animate-pulse p-4">
+                <div className="w-4 h-4 rounded-full bg-slate-700 animate-bounce"></div>
+                <span>Loading user feedback records...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl">
@@ -57,7 +73,9 @@ export default function MyComments() {
                     <MessageSquare className="h-6 w-6 text-emerald-400" />
                     <span>My Feedback & Insights</span>
                 </h1>
-                <p className="text-xs text-slate-400 mt-1">Manage and audit all testimonials and professional reviews submitted by your account.</p>
+                <p className="text-xs text-slate-400 mt-1">
+                    Manage and audit all testimonials and professional reviews submitted by your account.
+                </p>
             </div>
 
             {!comments || comments.length === 0 ? (

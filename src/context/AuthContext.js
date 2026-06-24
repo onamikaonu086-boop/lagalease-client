@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
         if (!res.ok) throw new Error(data.message || 'Registration failed');
         
         if (data.token) {
-            loginUser(email, data.token, { name, email, image: photoURL });
+            loginUser(email, data.token, { name, email, photoURL });
         }
         return data;
     };
@@ -58,9 +58,41 @@ export const AuthProvider = ({ children }) => {
         if (!res.ok) throw new Error(data.message || 'Login failed');
         
         if (data.token) {
-            loginUser(email, data.token, data.user);
+            const formattedUser = {
+                name: data.user?.name,
+                email: data.user?.email,
+                photoURL: data.user?.photoURL || data.user?.image || ""
+            };
+            loginUser(email, data.token, formattedUser);
         }
         return data;
+    };
+
+    const loginWithGoogle = async (firebaseUser, token) => {
+        setLoading(true);
+        try {
+            const googleProfile = {
+                name: firebaseUser.displayName,
+                email: firebaseUser.email,
+                photoURL: firebaseUser.photoURL 
+            };
+
+            await fetch('http://localhost:5000/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: googleProfile.name,
+                    email: googleProfile.email,
+                    image: googleProfile.photoURL
+                })
+            });
+
+            loginUser(googleProfile.email, token, googleProfile);
+        } catch (error) {
+            console.error("Google authentication sync error:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const loginUser = async (email, token, userProfile) => {
@@ -70,7 +102,7 @@ export const AuthProvider = ({ children }) => {
         
         const res = await fetch(`http://localhost:5000/user/role/${email}`);
         const data = await res.json();
-        setRole(data.role);
+        setRole(data.role || "user");
     };
 
     const logout = () => {
@@ -81,7 +113,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, role, loading, createUser, login, loginUser, logout, setUser, setRole }}>
+        <AuthContext.Provider value={{ user, role, loading, createUser, login, loginUser, loginWithGoogle, logout, setUser, setRole }}>
             {children}
         </AuthContext.Provider>
     );

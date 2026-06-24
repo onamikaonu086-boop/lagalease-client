@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import CheckoutForm from "@/components/CheckoutForm";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 export default function PaymentPage() {
     const { id } = useParams();
@@ -13,18 +13,21 @@ export default function PaymentPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (id) {
-            fetch(`http://localhost:5000/hiring-request/${id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setAppointment(data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    console.error("Error fetching appointment:", err);
-                    setLoading(false);
-                });
-        }
+        if (!id) return;
+
+        fetch(`http://localhost:5000/hiring-request/${id}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch appointment details");
+                return res.json();
+            })
+            .then((data) => {
+                setAppointment(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Error fetching appointment:", err);
+                setLoading(false);
+            });
     }, [id]);
 
     if (loading) {
@@ -36,7 +39,11 @@ export default function PaymentPage() {
     }
 
     if (!appointment) {
-        return <div className="text-center text-red-400 mt-10">Hiring request details not found!</div>;
+        return (
+            <div className="text-center text-red-400 mt-10 p-6 bg-red-500/10 border border-red-500/20 max-w-md mx-auto rounded-xl">
+                ⚠️ Hiring request details not found or expired!
+            </div>
+        );
     }
 
     return (
@@ -45,9 +52,9 @@ export default function PaymentPage() {
             <p className="text-sm text-gray-400 mb-6">Complete your payment securely using credit or debit card.</p>
 
             <div className="mb-6 p-4 bg-gray-900/50 border border-gray-800 rounded-lg text-sm text-gray-300 space-y-1.5">
-                <p><span className="text-gray-400">Lawyer:</span> <strong className="text-white">{appointment.lawyerName}</strong></p>
-                <p><span className="text-gray-400">Specialization:</span> {appointment.specialization}</p>
-                <p><span className="text-gray-400">Amount to Pay:</span> <strong className="text-[#00cc88]">${appointment.fee}</strong></p>
+                <p><span className="text-gray-400">Lawyer:</span> <strong className="text-white">{appointment.lawyerName || "Professional Lawyer"}</strong></p>
+                <p><span className="text-gray-400">Specialization:</span> {appointment.specialization || "Legal Consultant"}</p>
+                <p><span className="text-gray-400">Amount to Pay:</span> <strong className="text-[#00cc88]">${appointment.fee || appointment.price}</strong></p>
             </div>
 
             <Elements stripe={stripePromise}>

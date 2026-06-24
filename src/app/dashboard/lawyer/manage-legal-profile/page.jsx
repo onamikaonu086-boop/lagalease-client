@@ -16,24 +16,36 @@ export default function ManageLegalProfile() {
     useEffect(() => {
         if (!user?.email) return;
 
+        setLoading(true);
         fetch(`http://localhost:5000/lawyer/profile/${user.email}`)
-            .then((res) => res.json())
+            .then((res) => {
+                if (!res.ok) throw new Error("Profile not found");
+                return res.json();
+            })
             .then((data) => {
                 if (data) {
                     setBio(data.bio || "");
                     setFee(data.fee || "");
                     setStatus(data.status || "Available");
                 }
-                setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch((err) => {
+                console.error("Error loading lawyer profile:", err);
+            })
+            .finally(() => setLoading(false));
     }, [user?.email]);
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
+        if (!user?.email) return toast.error("User session not found.");
+        
         setUpdating(true);
 
-        const updatedProfile = { bio, fee, status };
+        const updatedProfile = { 
+            bio, 
+            fee: Number(fee), 
+            status 
+        };
 
         try {
             const res = await fetch(`http://localhost:5000/lawyer/update/${user?.email}`, {
@@ -43,19 +55,29 @@ export default function ManageLegalProfile() {
             });
             const data = await res.json();
 
-            if (data.success) {
+            if (data.success || data.acknowledged || data.modifiedCount > 0) {
                 toast.success("Legal credentials updated successfully!");
+            } else if (data.matchedCount === 1 && data.modifiedCount === 0) {
+                toast.error("No changes were made to your profile.");
             } else {
                 toast.error(data.message || "Something went wrong.");
             }
         } catch (error) {
+            console.error("Sync error:", error);
             toast.error("Failed to sync profile with server.");
         } finally {
             setUpdating(false);
         }
     };
 
-    if (loading) return <div className="text-slate-400 text-sm">Loading workspace configurations...</div>;
+    if (loading) {
+        return (
+            <div className="flex items-center space-x-2 text-slate-400 text-sm animate-pulse p-6">
+                <div className="w-2 h-2 rounded-full bg-[#00cc88] animate-ping"></div>
+                <span>Loading workspace configurations...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-2xl">
@@ -92,6 +114,7 @@ export default function ManageLegalProfile() {
                         <input
                             required
                             type="number"
+                            min="1"
                             value={fee}
                             onChange={(e) => setFee(e.target.value)}
                             placeholder="e.g. 150"
@@ -120,7 +143,7 @@ export default function ManageLegalProfile() {
                 <button
                     type="submit"
                     disabled={updating}
-                    className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/10"
+                    className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-900 disabled:text-slate-600 disabled:border disabled:border-slate-800 text-slate-950 font-bold py-3.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/10"
                 >
                     <Save className="h-4 w-4" />
                     <span>{updating ? "Syncing Credentials..." : "Save Professional Profile"}</span>

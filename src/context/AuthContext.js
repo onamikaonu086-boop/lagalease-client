@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
             const parsedUser = JSON.parse(savedUser);
             setUser(parsedUser);
             
-            fetch(`http://localhost:5000/user/role/${parsedUser.email}`, {
+            fetch(`https://legalease-server-neon.vercel.app/user/role/${parsedUser.email}`, {
                 headers: { authorization: `Bearer ${token}` }
             })
             .then(res => res.json())
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const createUser = async (name, email, password, photoURL) => {
-        const res = await fetch('http://localhost:5000/register', { 
+        const res = await fetch('https://legalease-server-neon.vercel.app/register', { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, image: photoURL })
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = async (email, password) => {
-        const res = await fetch('http://localhost:5000/login', { 
+        const res = await fetch('https://legalease-server-neon.vercel.app/login', { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
                 photoURL: firebaseUser.photoURL 
             };
 
-            await fetch('http://localhost:5000/users', {
+            await fetch('https://legalease-server-neon.vercel.app/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(userProfile));
         setUser(userProfile);
         
-        const res = await fetch(`http://localhost:5000/user/role/${email}`);
+        const res = await fetch(`https://legalease-server-neon.vercel.app/user/role/${email}`);
         const data = await res.json();
         setRole(data.role || "user");
     };

@@ -17,7 +17,7 @@ export default function ManageLegalProfile() {
         if (!user?.email) return;
 
         setLoading(true);
-        fetch(`http://localhost:5000/lawyer/profile/${user.email}`)
+        fetch(`https://legalease-server-neon.vercel.app/lawyer/profile/${user.email}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Profile not found");
                 return res.json();
@@ -48,7 +48,7 @@ export default function ManageLegalProfile() {
         };
 
         try {
-            const res = await fetch(`http://localhost:5000/lawyer/update/${user?.email}`, {
+            const res = await fetch(`https://legalease-server-neon.vercel.app/lawyer/update/${user?.email}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedProfile)

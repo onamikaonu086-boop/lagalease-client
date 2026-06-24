@@ -35,7 +35,7 @@ export default function Login() {
         });
         const googleUser = await userInfoRes.json();
 
-        const backendRes = await fetch('http://localhost:5000/jwt', { 
+        const backendRes = await fetch('https://legalease-server-neon.vercel.app/jwt', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

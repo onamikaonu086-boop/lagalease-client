@@ -13,7 +13,7 @@ export default function CheckoutForm({ appointment }) {
 
     useEffect(() => {
         if (appointment?.fee > 0) {
-            fetch("http://localhost:5000/create-payment-intent", {
+            fetch("https://legalease-server-neon.vercel.app/create-payment-intent", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ price: appointment.fee }),
@@ -67,7 +67,7 @@ export default function CheckoutForm({ appointment }) {
         }
 
         if (paymentIntent.status === "succeeded") {
-            fetch(`http://localhost:5000/hiring-payment-success/${appointment._id}`, {
+            fetch(`https://legalease-server-neon.vercel.app/hiring-payment-success/${appointment._id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ transactionId: paymentIntent.id }),

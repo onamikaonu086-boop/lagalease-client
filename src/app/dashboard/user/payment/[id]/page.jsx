@@ -15,7 +15,7 @@ export default function PaymentPage() {
     useEffect(() => {
         if (!id) return;
 
-        fetch(`http://localhost:5000/hiring-request/${id}`)
+        fetch(`https://legalease-server-neon.vercel.app/hiring-request/${id}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch appointment details");
                 return res.json();

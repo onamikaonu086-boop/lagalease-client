@@ -7,7 +7,7 @@ export default function AllTransactions() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:5000/admin/transactions")
+        fetch("https://legalease-server-neon.vercel.app/admin/transactions")
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch financial transactions");
                 return res.json();

@@ -22,7 +22,7 @@ export default function UpdateUserProfile() {
         setUpdating(true);
 
         try {
-            const res = await fetch(`http://localhost:5000/users/update/${user?.email}`, {
+            const res = await fetch(`https://legalease-server-neon.vercel.app/users/update/${user?.email}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, photoURL })

@@ -29,7 +29,7 @@ export default function LawyerProfile({ params: paramsPromise }) {
   useEffect(() => {
     if (!lawyerId) return;
     
-    fetch(`http://localhost:5000/lawyer/${lawyerId}`)
+    fetch(`https://legalease-server-neon.vercel.app/lawyer/${lawyerId}`)
       .then((res) => res.json())
       .then((data) => {
         setLawyer(data);
@@ -37,7 +37,7 @@ export default function LawyerProfile({ params: paramsPromise }) {
       })
       .catch(() => setLoading(false));
 
-    fetch(`http://localhost:5000/reviews/lawyer/${lawyerId}`)
+    fetch(`https://legalease-server-neon.vercel.app/reviews/lawyer/${lawyerId}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -84,7 +84,7 @@ export default function LawyerProfile({ params: paramsPromise }) {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/hiring-request', {
+      const res = await fetch('https://legalease-server-neon.vercel.app/hiring-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(hiringData)
@@ -121,7 +121,7 @@ export default function LawyerProfile({ params: paramsPromise }) {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/reviews', {
+      const res = await fetch('https://legalease-server-neon.vercel.app/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reviewData)

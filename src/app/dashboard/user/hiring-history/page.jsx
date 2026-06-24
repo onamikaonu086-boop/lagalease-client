@@ -9,7 +9,7 @@ export default function UserHiringHistory() {
 
     useEffect(() => {
         if (user?.email) {
-            fetch(`http://localhost:5000/user/hiring-history/${user.email}`)
+            fetch(`https://legalease-server-neon.vercel.app/user/hiring-history/${user.email}`)
                 .then(res => res.json())
                 .then(data => {
                     setHistory(data);

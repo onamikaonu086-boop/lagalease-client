@@ -14,7 +14,7 @@ export default function BrowseLawyers() {
   useEffect(() => {
     setLoading(true);
    
-    let url = `http://localhost:5000/lawyers?`;
+    let url = `https://legalease-server-neon.vercel.app/lawyers?`;
     if (searchText) url += `search=${searchText}&`;
     if (selectedSpecialization) url += `specialization=${selectedSpecialization}`;
 

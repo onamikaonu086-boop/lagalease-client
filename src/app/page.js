@@ -10,7 +10,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/lawyers?limit=6")
+    fetch("https://legalease-server-neon.vercel.app/lawyers?limit=6")
       .then((res) => res.json())
       .then((data) => {
         setFeaturedLawyers(data.result || []);

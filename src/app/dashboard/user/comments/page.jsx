@@ -13,7 +13,7 @@ export default function MyComments() {
         if (!user?.email) return;
 
         setLoading(true);
-        fetch(`http://localhost:5000/reviews/user/${user.email}`)
+        fetch(`https://legalease-server-neon.vercel.app/reviews/user/${user.email}`)
             .then((res) => {
                 if (!res.ok) throw new Error("Network response was not ok");
                 return res.json();
@@ -40,7 +40,7 @@ export default function MyComments() {
         if (!window.confirm("Are you sure you want to delete this insight?")) return;
 
         try {
-            const res = await fetch(`http://localhost:5000/reviews/${id}`, {
+            const res = await fetch(`https://legalease-server-neon.vercel.app/reviews/${id}`, {
                 method: "DELETE",
             });
             const data = await res.json();

@@ -13,7 +13,7 @@ export default function LawyerHiringRequests() {
         if (!user?.email) return;
 
         setLoading(true);
-        fetch(`http://localhost:5000/lawyer/hiring-requests/${user.email}`)
+        fetch(`https://legalease-server-neon.vercel.app/lawyer/hiring-requests/${user.email}`)
             .then(res => {
                 if (!res.ok) throw new Error("Failed to fetch data");
                 return res.json();
@@ -31,7 +31,7 @@ export default function LawyerHiringRequests() {
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {
-            const res = await fetch(`http://localhost:5000/hiring-status/${id}`, {
+            const res = await fetch(`https://legalease-server-neon.vercel.app/hiring-status/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })

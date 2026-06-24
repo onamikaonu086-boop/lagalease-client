@@ -7,7 +7,7 @@ export default function AnalyticsOverview() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:5000/admin/analytics")
+        fetch("https://legalease-server-neon.vercel.app/admin/analytics")
             .then(res => {
                 if (!res.ok) throw new Error("Failed to fetch analytical metrics");
                 return res.json();

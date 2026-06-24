@@ -8,7 +8,7 @@ export default function ManageUsers() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:5000/users")
+        fetch("https://legalease-server-neon.vercel.app/users")
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch users directory");
                 return res.json();
@@ -25,7 +25,7 @@ export default function ManageUsers() {
 
     const handleRoleUpdate = async (id, newRole, userName) => {
         try {
-            const res = await fetch(`http://localhost:5000/users/role/${id}`, {
+            const res = await fetch(`https://legalease-server-neon.vercel.app/users/role/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ role: newRole }),

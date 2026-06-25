@@ -22,6 +22,7 @@ export default function DashboardLayout({ children }) {
             { name: "Manage Users", path: "/dashboard/admin/manage-users" },
             { name: "All Transactions", path: "/dashboard/admin/all-transactions" },
             { name: "Analytics Overview", path: "/dashboard/admin/analytics" },
+            { name: "Add New Lawyer", path: "/dashboard/admin/add-lawyer" },
         ],
     };
 
@@ -33,7 +34,11 @@ export default function DashboardLayout({ children }) {
                 <aside className="w-64 bg-[#111827] border-r border-gray-800 p-6 flex flex-col justify-between">
                     <div>
                         <div className="mb-8">
-                            <h2 className="text-xl font-bold text-[#00cc88] tracking-wider">LegalEase</h2>
+                            <Link href="/dashboard" className="block group">
+                                <h2 className="text-xl font-bold text-[#00cc88] tracking-wider transition-all group-hover:opacity-80">
+                                    LegalEase
+                                </h2>
+                            </Link>
                             <p className="text-xs text-gray-400 capitalize mt-1">Portal: {role}</p>
                         </div>
                         <nav className="space-y-2">

@@ -13,7 +13,7 @@ export default function Home() {
     fetch("https://legalease-server-neon.vercel.app/lawyers?limit=6")
       .then((res) => res.json())
       .then((data) => {
-        setFeaturedLawyers(data.result || []);
+        setFeaturedLawyers(Array.isArray(data) ? data : []);
         setLoading(false); 
       })
       .catch(() => setLoading(false));

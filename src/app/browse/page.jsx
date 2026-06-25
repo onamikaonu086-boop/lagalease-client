@@ -21,7 +21,7 @@ export default function BrowseLawyers() {
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        setLawyers(data.result || []);
+        setLawyers(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
